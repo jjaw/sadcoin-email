@@ -436,6 +436,7 @@ export default function Component() {
         return (
           <SentScreen
             onResetGame={resetGame}
+            onBackToResponses={() => setGameState("agent-responses")}
           />
         )
 

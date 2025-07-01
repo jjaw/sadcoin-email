@@ -1,10 +1,37 @@
+import { useState } from 'react'
 import { Character } from '@/types/game'
+import { useStartGameSession } from '@/hooks/useContracts'
+import { SEPOLIA_CONTRACTS, GameRewards_ABI } from '@/lib/contracts'
 
 interface LoginScreenProps {
   onSelectCharacter: (character: Character) => void
 }
 
 export function LoginScreen({ onSelectCharacter }: LoginScreenProps) {
+  const [isStartingGame, setIsStartingGame] = useState(false)
+  const { writeContract: startGameSession, isPending: isStartingSession } = useStartGameSession()
+
+  const handleSelectIntern = async () => {
+    try {
+      setIsStartingGame(true)
+      
+      // Start the game session first
+      await startGameSession({
+        address: SEPOLIA_CONTRACTS.GameRewards,
+        abi: GameRewards_ABI,
+        functionName: 'startGameSession'
+      })
+      
+      // Then proceed with character selection
+      onSelectCharacter("intern")
+    } catch (error) {
+      console.error('Failed to start game session:', error)
+      // Still proceed with character selection even if game session fails
+      onSelectCharacter("intern")
+    } finally {
+      setIsStartingGame(false)
+    }
+  }
   return (
     <div className="text-center space-y-6">
       {/* Login Header */}
@@ -47,14 +74,16 @@ export function LoginScreen({ onSelectCharacter }: LoginScreenProps) {
 
         {/* Intern - Available */}
         <div 
-          className="flex flex-col items-center space-y-2 cursor-pointer hover:bg-green-900/20 p-2 rounded transition-colors"
-          onClick={() => onSelectCharacter("intern")}
+          className={`flex flex-col items-center space-y-2 cursor-pointer hover:bg-green-900/20 p-2 rounded transition-colors ${(isStartingGame || isStartingSession) ? 'opacity-50 pointer-events-none' : ''}`}
+          onClick={handleSelectIntern}
         >
           <div className="w-16 h-16 border-2 border-green-400 bg-black flex items-center justify-center text-green-400">
             👨‍💼
           </div>
           <span className="text-sm text-green-400">Intern</span>
-          <span className="text-xs text-green-300">CLICK TO SELECT</span>
+          <span className="text-xs text-green-300">
+            {(isStartingGame || isStartingSession) ? "STARTING GAME..." : "CLICK TO SELECT"}
+          </span>
         </div>
       </div>
 
