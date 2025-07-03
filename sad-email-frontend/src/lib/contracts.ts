@@ -1,11 +1,11 @@
 // Contract addresses deployed on Sepolia testnet
 export const SEPOLIA_CONTRACTS = {
-  SADCoin: "0xace84066b7e68f636dac3c3438975de22cf4af20",
-  FEELS: "0xe5180fa5acaf05717d49bf2ec4f6fd0261db92b2",
-  StakingContract: "0xf62ab5625521f4a9883565b72ddc4f86098f1062",
-  GameRewards: "0x47bea96317ddcc926696f83db55389898493dbcd",
-  ConversionContract: "0x2dbfae1ff52735a145bbdfc0822085143bd462e3",
-  NFTClaim: "0x037feb654b637226b5503a237361d1c3b4de7b30"
+  SADCoin: "0x3eD4e0a08F406f30f663980776ce9Ba39dF0896b",
+  FEELS: "0x9C6D312F789824a4a1FE847e9d14ee844bc66899",
+  StakingContract: "0x710f17BBd1BcDCA3ea4974202dFaF84e02275466",
+  GameRewards: "0x775de4740a0B65cC11c65c7802a854124ceDf02F",
+  ConversionContract: "0x3C45511003fC8F7311954e3f4966Bb4072879843",
+  NFTClaim: "0xEe217a78241643A4e9025FFc9Ec38566F2fDC4f4"
 } as const;
 
 // Minimal ABIs for immediate testing - extracted from contract interfaces
@@ -203,7 +203,9 @@ export const GameRewards_ABI = [
     "outputs": [
       {"internalType": "address", "name": "player", "type": "address"},
       {"internalType": "uint256", "name": "score", "type": "uint256"},
-      {"internalType": "uint256", "name": "timestamp", "type": "uint256"}
+      {"internalType": "uint256", "name": "timestamp", "type": "uint256"},
+      {"internalType": "bool", "name": "rewarded", "type": "bool"},
+      {"internalType": "uint256", "name": "vrfRequestId", "type": "uint256"}
     ],
     "stateMutability": "view",
     "type": "function"

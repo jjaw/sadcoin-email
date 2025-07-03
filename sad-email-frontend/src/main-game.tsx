@@ -102,8 +102,8 @@ export default function Component() {
     formattedSad: sadCoins,
     formattedFeels: feels,
     contractAddresses: {
-      SADCoin: "0xace84066b7e68f636dac3c3438975de22cf4af20",
-      FEELS: "0xe5180fa5acaf05717d49bf2ec4f6fd0261db92b2"
+      SADCoin: SEPOLIA_CONTRACTS.SADCoin,
+      FEELS: SEPOLIA_CONTRACTS.FEELS
     }
   })
 
@@ -518,6 +518,7 @@ export default function Component() {
             onSubmit={handleEmailSubmit} 
             onWaterCooler={gameState === "water-cooler" ? handleBackFromWaterCooler : handleWaterCooler}
             isWaterCoolerMode={gameState === "water-cooler"}
+            isLoading={isGeneratingEmail}
           />
         )}
         

@@ -96,7 +96,8 @@ contract DeploySepoliaScript is Script {
         console.log("Granted FEELS minter role to StakingContract and GameRewards");
         
         feels.grantRole(feels.BURNER_ROLE(), address(conversion));
-        console.log("Granted FEELS burner role to ConversionContract");
+        feels.grantRole(feels.BURNER_ROLE(), address(gameRewards));
+        console.log("Granted FEELS burner role to ConversionContract and GameRewards");
         
         // Grant SADCoin minting rights to conversion contract
         sadCoin.addSadMinter(address(conversion));
