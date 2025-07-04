@@ -496,10 +496,10 @@ export default function Component() {
         feelsBalance={feels}
         onAboutClick={() => setIsAboutModalOpen(true)}
       />
-      <div className="bg-black" style={{ minHeight: "calc(100vh - 70px)" }}>
+      <div className="bg-black" style={{ minHeight: "calc(100vh - 70px)", marginTop: "80px" }}>
         {/* Monitor Area */}
         <CRTContainer>
-          <Card className="border-2 border-green-400 bg-black text-green-400 w-full h-full flex flex-col">
+          <Card className="border-0 border-green-400 bg-transparent text-green-400 w-full h-full flex flex-col">
             {/* Main Terminal - Full screen usage */}
             <div className="flex-1 overflow-auto p-6">
               {renderScreen()}
