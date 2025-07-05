@@ -8,7 +8,7 @@ interface EmailInputScreenProps {
   isLoading?: boolean
 }
 
-export function EmailInputScreen({ onSubmit }: EmailInputScreenProps) {
+export function EmailInputScreen({ onSubmit, onWaterCooler, isWaterCoolerMode, isLoading }: EmailInputScreenProps) {
   const [userSadInput, setUserSadInput] = useState('')
 
   const handleSubmit = () => {
