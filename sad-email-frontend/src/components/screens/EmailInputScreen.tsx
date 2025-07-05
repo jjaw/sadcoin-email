@@ -86,7 +86,8 @@ export function EmailInputContainer({ onSubmit, onWaterCooler, isWaterCoolerMode
             onChange={(e) => setUserSadInput(e.target.value)}
             placeholder="Paste your sad content or sad idea that needs to be in an email..."
             maxLength={256}
-            className="w-full h-32 border-2 border-green-400 bg-black text-green-400 p-3 resize-none font-mono text-sm"
+            className={`w-full h-32 border-2 border-green-400 bg-black text-green-400 p-3 resize-none font-mono text-sm${isWaterCoolerMode ? ' opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isWaterCoolerMode}
           />
           <div className="text-xs text-green-500 mt-1 text-right">
             {userSadInput.length}/256
@@ -98,7 +99,7 @@ export function EmailInputContainer({ onSubmit, onWaterCooler, isWaterCoolerMode
           <div className="w-36 h-8 border-2 border-green-400 bg-black rounded-lg flex items-center justify-center">
             <Button 
               onClick={handleSubmit}
-              disabled={isLoading || !userSadInput.trim()}
+              disabled={isLoading || !userSadInput.trim() || isWaterCoolerMode}
               className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-black text-xs px-2 py-1 w-full"
             >
               {isLoading ? "CRAFTING..." : "WRITE THE E-MAIL"}

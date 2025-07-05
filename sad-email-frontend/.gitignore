@@ -43,6 +43,7 @@ next-env.d.ts
 # cursor rules
 .cursor/
 PRD.md
+fix.md
 
 # updates
 UPDATE.md
