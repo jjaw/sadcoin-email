@@ -7,8 +7,7 @@ import { Card } from "@/components/ui/card"
 import AboutModal from "./components/AboutModal"
 import CRTContainer from "./components/CRTContainer"
 import NavBar from "./components/NavBar"
-import { GameState, Character, Email } from "@/types/game"
-import { emails } from "@/data/gameData"
+import { GameState, Character } from "@/types/game"
 import {
   useSADCoinBalance,
   useFEELSBalance,
@@ -28,9 +27,7 @@ import {
   LoadingCScreen,
   EmailInputScreen,
   EmailInputContainer,
-  InboxScreen,
   LoadingContainer,
-  ReadingScreen,
   CharacterSelectScreen,
   MiniGameScreen,
   WritingScreen,
@@ -39,12 +36,13 @@ import {
   EmailViewScreen,
   WaterCoolerScreen
 } from "./components/screens"
+import { AgentResponsesContainer } from "./components/screens/AgentResponsesScreen"
 
 export default function Component() {
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const [gameState, setGameState] = useState<GameState>("login")
-  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null)
+  const [previousState, setPreviousState] = useState<GameState>("email-input")
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null)
   const [generatedEmails, setGeneratedEmails] = useState<EmailGenerationResponse | null>(null)
   const [isGeneratingEmail, setIsGeneratingEmail] = useState(false)
@@ -191,14 +189,6 @@ export default function Component() {
   }, [isConnected, chainId])
 
   // Event handlers
-  const handleEmailClick = (email: Email) => {
-    setSelectedEmail(email)
-    setGameState("reading")
-  }
-
-  const handleCharacterInteraction = () => {
-    setGameState("character-select")
-  }
 
   const handleCharacterSelect = (character: Character) => {
     setSelectedCharacter(character)
@@ -256,11 +246,12 @@ export default function Component() {
   }
 
   const handleWaterCooler = () => {
+    setPreviousState(gameState)
     setGameState("water-cooler")
   }
 
   const handleBackFromWaterCooler = () => {
-    setGameState("email-input")
+    setGameState(previousState)
   }
 
   const handleEmailSelect = (email: EmailContent, sender: string) => {
@@ -333,7 +324,6 @@ export default function Component() {
 
   const resetGame = () => {
     setGameState("login")
-    setSelectedEmail(null)
     setSelectedCharacter(null)
     setGeneratedEmails(null)
     setIsGeneratingEmail(false)
@@ -389,23 +379,7 @@ export default function Component() {
           />
         )
 
-      case "inbox":
-        return (
-          <InboxScreen
-            emails={emails}
-            onEmailClick={handleEmailClick}
-          />
-        )
 
-      case "reading":
-        return selectedEmail && selectedCharacter ? (
-          <ReadingScreen
-            selectedEmail={selectedEmail}
-            selectedCharacter={selectedCharacter}
-            onBackToInbox={() => setGameState("inbox")}
-            onCharacterInteraction={handleCharacterInteraction}
-          />
-        ) : null
 
       case "character-select":
         return selectedCharacter ? (
@@ -429,6 +403,7 @@ export default function Component() {
             generatedEmail={selectedEmailContent}
             isGeneratingEmail={isGeneratingEmail}
             onSendEmail={(emailContent, recipientEmail) => sendEmail(emailContent, recipientEmail)}
+            onWaterCooler={handleWaterCooler}
           />
         ) : null
 
@@ -459,6 +434,7 @@ export default function Component() {
             sender={selectedEmailSender}
             onBack={handleEmailViewBack}
             onContinue={handleEmailViewContinue}
+            onWaterCooler={handleWaterCooler}
           />
         ) : null
 
@@ -519,6 +495,17 @@ export default function Component() {
             onWaterCooler={gameState === "water-cooler" ? handleBackFromWaterCooler : handleWaterCooler}
             isWaterCoolerMode={gameState === "water-cooler"}
             isLoading={isGeneratingEmail}
+          />
+        )}
+        
+        {gameState === "agent-responses" && generatedEmails && (
+          <AgentResponsesContainer
+            userSadInput={userSadInput}
+            agentInitialEmail={generatedEmails.agentInitialEmail}
+            officerInitialEmail={generatedEmails.officerInitialEmail}
+            monkeyInitialEmail={generatedEmails.monkeyInitialEmail}
+            onSelectEmail={handleEmailSelect}
+            onWaterCooler={handleWaterCooler}
           />
         )}
         

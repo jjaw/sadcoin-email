@@ -7,13 +7,15 @@ interface EmailViewScreenProps {
   sender: string
   onBack: () => void
   onContinue: (email: EmailContent, recipientEmail: string) => void
+  onWaterCooler?: () => void
 }
 
 export function EmailViewScreen({ 
   email, 
   sender, 
   onBack, 
-  onContinue 
+  onContinue,
+  onWaterCooler 
 }: EmailViewScreenProps) {
   const [editableEmail, setEditableEmail] = useState<EmailContent>({ subject: '', body: '' })
   const [recipientEmail, setRecipientEmail] = useState('')
@@ -102,9 +104,20 @@ export function EmailViewScreen({
       </div>
 
       <div className="text-center">
-        <Button onClick={handleContinue} className="bg-green-600 hover:bg-green-700 text-black">
-          Continue with this email →
-        </Button>
+        <div className="flex gap-3 justify-center">
+          <Button onClick={handleContinue} className="bg-green-600 hover:bg-green-700 text-black">
+            Continue with this email →
+          </Button>
+          
+          {onWaterCooler && (
+            <Button 
+              onClick={onWaterCooler}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              💧 SAD WATER COOLER
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="mt-6 p-4 border border-blue-400 text-blue-400 text-sm">
