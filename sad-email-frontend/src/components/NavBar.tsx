@@ -87,16 +87,16 @@ export default function NavBar({ gameState, debugInfo, sadBalance = "0", feelsBa
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "0.25rem 1rem",
+        padding: "1.25rem 1rem",
         height: "35px",
-        borderBottom: "1px solid #39ff1444"
+        marginTop: "10px"
       }}>
         <div style={{ fontWeight: "bold", fontSize: "0.9rem", letterSpacing: "1px" }}>
           <span style={{ color: "#39ff14" }}>SADCOIN</span>
           <span style={{ color: "#39ff14", marginLeft: "0.5rem" }}>Let's Write an E-Mail</span>
         </div>
         
-        <div style={{ position: "relative", flexShrink: 0 }}>
+        <div style={{ position: "relative", flexShrink: 0}}>
           {!isClient ? (
             <div style={{ height: "28px", width: "120px" }}></div>
           ) : !isConnected ? (
@@ -214,7 +214,8 @@ export default function NavBar({ gameState, debugInfo, sadBalance = "0", feelsBa
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0.25rem 1rem",
-        height: "35px"
+        height: "30px",
+        marginTop: "4px"
       }}>
         <button
           onClick={onAboutClick}

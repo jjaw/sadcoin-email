@@ -1,0 +1,9 @@
+[submodule "contracts-immense-pool-of-sadness/lib/forge-std"]
+	path = contracts-immense-pool-of-sadness/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "contracts-immense-pool-of-sadness/lib/chainlink"]
+	path = contracts-immense-pool-of-sadness/lib/chainlink
+	url = https://github.com/smartcontractkit/chainlink
+[submodule "contracts-immense-pool-of-sadness/lib/openzeppelin-contracts"]
+	path = contracts-immense-pool-of-sadness/lib/openzeppelin-contracts
+	url = https://github.com/openzeppelin/openzeppelin-contracts

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Character } from '@/types/game'
 
 interface LoginScreenProps {
@@ -5,6 +6,10 @@ interface LoginScreenProps {
 }
 
 export function LoginScreen({ onSelectCharacter }: LoginScreenProps) {
+  const handleSelectIntern = () => {
+    onSelectCharacter("intern")
+  }
+
   return (
     <div className="text-center space-y-6">
       {/* Login Header */}
@@ -48,7 +53,7 @@ export function LoginScreen({ onSelectCharacter }: LoginScreenProps) {
         {/* Intern - Available */}
         <div 
           className="flex flex-col items-center space-y-2 cursor-pointer hover:bg-green-900/20 p-2 rounded transition-colors"
-          onClick={() => onSelectCharacter("intern")}
+          onClick={handleSelectIntern}
         >
           <div className="w-16 h-16 border-2 border-green-400 bg-black flex items-center justify-center text-green-400">
             👨‍💼

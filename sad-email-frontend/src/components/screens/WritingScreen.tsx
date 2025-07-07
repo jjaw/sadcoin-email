@@ -8,13 +8,15 @@ interface WritingScreenProps {
   generatedEmail: EmailContent | null
   isGeneratingEmail: boolean
   onSendEmail: (email: EmailContent, recipientEmail: string) => void
+  onWaterCooler?: () => void
 }
 
 export function WritingScreen({ 
   selectedCharacter, 
   generatedEmail, 
   isGeneratingEmail, 
-  onSendEmail 
+  onSendEmail,
+  onWaterCooler 
 }: WritingScreenProps) {
   const [editableEmail, setEditableEmail] = useState<EmailContent>({ subject: '', body: '' })
   const [recipientEmail, setRecipientEmail] = useState('')
@@ -104,9 +106,20 @@ export function WritingScreen({
             />
           </div>
 
-          <Button onClick={handleSendEmail} className="bg-green-600 hover:bg-green-700 text-black">
-            Send Email →
-          </Button>
+          <div className="flex gap-3">
+            <Button onClick={handleSendEmail} className="bg-green-600 hover:bg-green-700 text-black">
+              Send Email →
+            </Button>
+            
+            {onWaterCooler && (
+              <Button 
+                onClick={onWaterCooler}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                💧 SAD WATER COOLER
+              </Button>
+            )}
+          </div>
         </div>
       )}
 
