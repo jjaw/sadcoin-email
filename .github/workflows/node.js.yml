@@ -1,7 +1,7 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: Node.js CI
+name: Frontend CI
 
 on:
   push:
@@ -27,13 +27,21 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          cd sad-email-frontend
+          npm ci
 
-      - name: Run lint
-        run: npm run lint
+      - name: Lint
+        run: |
+          cd sad-email-frontend
+          npm run lint
 
-      - name: Build the project
-        run: npm run build --if-present
+      - name: Build
+        run: |
+          cd sad-email-frontend
+          npm run build
 
-      - name: Run tests
-        run: npm test
+      - name: Test
+        run: |
+          cd sad-email-frontend
+          npm test
