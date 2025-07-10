@@ -10,6 +10,7 @@ on:
     branches: [ "main", "dev" ]
   pull_request:
     branches: [ "main", "dev" ]
+  workflow_dispatch:
 
 jobs:
   build-and-check:
@@ -22,6 +23,8 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_BEDROCK_ENABLED: ${{ secrets.AWS_BEDROCK_ENABLED }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
 
     strategy:
       matrix:
