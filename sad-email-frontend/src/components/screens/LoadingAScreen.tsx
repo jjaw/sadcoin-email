@@ -60,7 +60,7 @@ export function LoadingAScreen({ onContinue }: LoadingAScreenProps) {
   }
 
   const isValidAmount = usdAmountNum >= 0.01 // Minimum $0.01
-  const hasSufficientSAD = sadBalance && sadBalance >= parseEther('1') // Need at least 1 SADCoin
+  const hasSufficientSAD = (sadBalance ?? 0n) >= parseEther('1') // Need at least 1 SADCoin
 
   // Cooldown calculation (1 hour = 3600 seconds)
   const lastPurchaseTimeNum = lastPurchaseTime ? Number(lastPurchaseTime) : 0
