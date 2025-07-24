@@ -45,3 +45,5 @@ next-env.d.ts
 PRD.md
 fix.md
 
+# sqlite3 local DB
+faucet-claims.db
