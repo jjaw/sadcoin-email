@@ -81,7 +81,7 @@ export async function POST(req: Request) {
   let fundingTxHash: string | undefined;
   try {
     fundingTxHash = await walletClient.sendTransaction({
-      to: address,
+      to: address as `0x${string}`,
       value: parseEther('0.009'), // 0.007 ETH for purchase + 0.002 for gas buffer
     });
     console.info(`[Faucet] Sent 0.009 ETH to ${address}. Tx: ${fundingTxHash}`);
