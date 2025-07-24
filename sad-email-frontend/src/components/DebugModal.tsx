@@ -25,8 +25,11 @@ export function DebugModal({ debugInfo }: DebugModalProps) {
   const { writeContractAsync: purchaseSadness } = useWriteContract()
   const { data: ethBalance } = useBalance({
     address: debugInfo?.address as `0x${string}`,
-    watch: true,
+    query: {
+      refetchInterval: 10_000, // Optional: 10 seconds polling
+    },
   })
+  
 
   // Fetch claimed status when modal opens or after claiming
   useEffect(() => {
