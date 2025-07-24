@@ -25,6 +25,8 @@ jobs:
       AWS_BEDROCK_ENABLED: ${{ secrets.AWS_BEDROCK_ENABLED }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
+      CHAINSTACK_RPC_URL: ${{ secrets.CHAINSTACK_RPC_URL }}
+      FAUCET_PRIVATE_KEY: ${{ secrets.FAUCET_PRIVATE_KEY }}
 
     strategy:
       matrix:
