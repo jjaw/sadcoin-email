@@ -1,32 +1,53 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { DebugPanel } from "./DebugPanel"
 import { SimpleTest } from "./SimpleTest"
 import { PriceCalculator } from "./PriceCalculator"
+import { useWriteContract, useBalance } from 'wagmi'
+import { SEPOLIA_CONTRACTS, ConversionContract_ABI } from '@/lib/contracts'
+import { parseEther } from 'viem'
 
 interface DebugModalProps {
   debugInfo?: {
-    chainId?: number
-    sadBalance?: string
-    directSadBalance?: string
-    sadLoading?: boolean
-    directSadLoading?: boolean
-    sadError?: Error | null
-    directSadError?: Error | null
     address?: string
-    isOnSepolia?: boolean
-    feelsBalance?: string
-    feelsLoading?: boolean
     isConnected?: boolean
-    useAWS?: boolean
-    setUseAWS?: (value: boolean) => void
   }
-  gameState?: string
 }
 
-export function DebugModal({ debugInfo, gameState }: DebugModalProps) {
+export function DebugModal({ debugInfo }: DebugModalProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [claimStatus, setClaimStatus] = useState<string | null>(null)
+  const [claimLoading, setClaimLoading] = useState(false)
+  const [hasClaimed, setHasClaimed] = useState(false)
+  const [autoPurchaseStatus, setAutoPurchaseStatus] = useState<string | null>(null)
+
+  const { writeContractAsync: purchaseSadness } = useWriteContract()
+  const { data: ethBalance } = useBalance({
+    address: debugInfo?.address as `0x${string}`,
+    watch: true,
+  })
+
+  // Fetch claimed status when modal opens or after claiming
+  useEffect(() => {
+    if (debugInfo?.address && isOpen) {
+      fetch(`/api/claim-faucet?address=${debugInfo.address}`)
+        .then(res => res.json())
+        .then(data => setHasClaimed(!!data.claimed))
+        .catch(() => setHasClaimed(false));
+    }
+  }, [debugInfo?.address, isOpen, claimStatus]);
+
+  // Clear statuses after final purchase status
+  useEffect(() => {
+    if (autoPurchaseStatus?.startsWith("✅") || autoPurchaseStatus?.startsWith("❌")) {
+      const timer = setTimeout(() => {
+        setClaimStatus(null)
+        setAutoPurchaseStatus(null)
+      }, 60000)
+      return () => clearTimeout(timer)
+    }
+  }, [autoPurchaseStatus])
 
   if (!isOpen) {
     return (
@@ -37,6 +58,47 @@ export function DebugModal({ debugInfo, gameState }: DebugModalProps) {
         🔧 DEBUG
       </Button>
     )
+  }
+
+  const handleClaimSADToken = async () => {
+    if (!debugInfo?.address) return;
+    setClaimLoading(true)
+    setClaimStatus("✅ ETH sent! Awaiting auto SAD purchase... It can take up to a minute")
+    setAutoPurchaseStatus(null)
+
+    // Request ETH from faucet
+    try {
+      const res = await fetch("/api/claim-faucet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: debugInfo.address }),
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setHasClaimed(true)
+
+        // Initiate SAD purchase via MetaMask (hash-only)
+        try {
+          setAutoPurchaseStatus("⏳ Initiating SAD purchase...")
+          const txHash = await purchaseSadness({
+            address: SEPOLIA_CONTRACTS.ConversionContract,
+            abi: ConversionContract_ABI,
+            functionName: "purchaseSadness",
+            args: [],
+            value: parseEther("0.007"),
+          })
+          setAutoPurchaseStatus(`✅ Transaction sent: ${txHash}`)
+        } catch (err: any) {
+          console.error("Auto purchase failed:", err)
+          setAutoPurchaseStatus("❌ Auto purchase failed: " + err.message)
+        }
+      } else {
+        setClaimStatus("❌ Claim failed: " + (data.error || "Unknown error"))
+      }
+    } catch (err: any) {
+      setClaimStatus("❌ Claim failed: " + (err.message || "Unknown error"))
+    }
+    setClaimLoading(false)
   }
 
   return (
@@ -52,87 +114,48 @@ export function DebugModal({ debugInfo, gameState }: DebugModalProps) {
           </Button>
         </div>
         <div className="p-4 space-y-6">
-          {/* Debug Information */}
-          {debugInfo && (
-            <div className="bg-black border border-green-400 p-3 rounded text-xs text-green-400 font-mono">
-              <div className="font-bold mb-2 text-green-300 border-b border-green-400 pb-1">DEBUG INFO</div>
-              
-              {/* Game State */}
-              {gameState && (
-                <div className="mb-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-green-300">State:</span>
-                    <span className="text-green-400">{gameState}</span>
-                  </div>
-                </div>
-              )}
-              
-              {/* Wallet and Chain Group */}
-              {(debugInfo.address || debugInfo.chainId) && (
-                <div className="mb-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-green-300">Wallet:</span>
-                    <span className="text-green-400">
-                      {debugInfo.address ? `${debugInfo.address.slice(0, 6)}...${debugInfo.address.slice(-4)}` : 'Not Connected'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-green-300">Chain:</span>
-                    <span className="text-green-400">
-                      {debugInfo.chainId} {debugInfo.isOnSepolia ? '(Sepolia)' : ''}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* SAD and Direct Balance Group */}
-              {(debugInfo.sadBalance || debugInfo.directSadBalance) && (
-                <div className="mb-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-green-300">SAD:</span>
-                    <span className="text-green-400">
-                      {debugInfo.sadLoading ? "..." : debugInfo.sadBalance || "0.0"}
-                    </span>
-                  </div>
-                  {debugInfo.directSadBalance && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-green-300">Direct:</span>
-                      <span className="text-green-400">
-                        {debugInfo.directSadLoading ? "..." : debugInfo.directSadBalance}
-                      </span>
-                    </div>
+          {debugInfo?.isConnected && (
+            <div className="flex flex-col items-center space-y-2 bg-black border border-cyan-400 p-3 rounded">
+              <Button
+                onClick={handleClaimSADToken}
+                disabled={hasClaimed || claimLoading}
+                className={`text-xs px-4 py-2 font-mono ${
+                  hasClaimed
+                    ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
+                    : 'bg-cyan-600 hover:bg-cyan-700 text-black'
+                }`}
+              >
+                {hasClaimed
+                  ? '✅ Already Claimed'
+                  : claimLoading
+                    ? 'Claiming...'
+                    : '💸 CLAIM FREE ETH + SAD'}
+              </Button>
+              <div className="text-xs italic text-cyan-300 mt-1">
+                {hasClaimed ? '*You have already claimed FREE SAD' : '*First time SAD USERS only 😢'}
+              </div>
+              {(claimStatus || autoPurchaseStatus) && (
+                <div className="flex flex-col items-center space-y-1">
+                  {claimStatus && (
+                    <div className={`text-xs font-mono ${
+                      claimStatus.startsWith('✅') ? 'text-green-400' :
+                     claimStatus.startsWith('⏳') ? 'text-yellow-300' : 'text-red-400'
+                    }`}>{claimStatus}</div>
+                  )}
+                  {autoPurchaseStatus && (
+                    <div className={`text-xs font-mono ${
+                      autoPurchaseStatus.startsWith('✅') ? 'text-green-400' :
+                     autoPurchaseStatus.startsWith('⏳') ? 'text-yellow-300' : 'text-red-400'
+                    }`}>{autoPurchaseStatus}</div>
                   )}
                 </div>
               )}
-
-              {/* FEELS Balance */}
-              {debugInfo.feelsBalance && (
-                <div className="mb-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-green-300">FEELS:</span>
-                    <span className="text-green-400">
-                      {debugInfo.feelsLoading ? "..." : debugInfo.feelsBalance}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Connection Status */}
-              <div className="flex justify-between items-center">
-                <span className="text-green-300">Status:</span>
-                <span className={`${debugInfo.isConnected ? 'text-green-400' : 'text-red-400'}`}>
-                  {debugInfo.isConnected ? 'Connected' : 'Disconnected'}
-                </span>
-              </div>
             </div>
           )}
-          
+
           <PriceCalculator />
           <SimpleTest />
-          <DebugPanel
-            useAWS={debugInfo?.useAWS}
-            setUseAWS={debugInfo?.setUseAWS}
-          />
+          <DebugPanel useAWS={debugInfo?.useAWS} setUseAWS={debugInfo?.setUseAWS} />
         </div>
       </div>
     </div>
