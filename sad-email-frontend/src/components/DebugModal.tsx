@@ -15,6 +15,7 @@ interface DebugModalProps {
     useAWS?: boolean
     setUseAWS?: (value: boolean) => void
   }
+  gameState?: string
 }
 
 
