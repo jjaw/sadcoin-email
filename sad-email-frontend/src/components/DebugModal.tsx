@@ -12,8 +12,11 @@ interface DebugModalProps {
   debugInfo?: {
     address?: string
     isConnected?: boolean
+    useAWS?: boolean
+    setUseAWS?: (value: boolean) => void
   }
 }
+
 
 export function DebugModal({ debugInfo }: DebugModalProps) {
   const [isOpen, setIsOpen] = useState(false)
