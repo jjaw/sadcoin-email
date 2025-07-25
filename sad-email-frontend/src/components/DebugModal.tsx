@@ -4,9 +4,7 @@ import { Button } from "@/components/ui/button"
 import { DebugPanel } from "./DebugPanel"
 import { SimpleTest } from "./SimpleTest"
 import { PriceCalculator } from "./PriceCalculator"
-import { useWriteContract, useBalance } from 'wagmi'
-import { SEPOLIA_CONTRACTS, ConversionContract_ABI } from '@/lib/contracts'
-import { parseEther } from 'viem'
+import { useBalance } from 'wagmi'
 
 interface DebugModalProps {
   debugInfo?: {
@@ -15,46 +13,53 @@ interface DebugModalProps {
     useAWS?: boolean
     setUseAWS?: (value: boolean) => void
   }
-  gameState?: string
 }
-
 
 export function DebugModal({ debugInfo }: DebugModalProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [claimStatus, setClaimStatus] = useState<string | null>(null)
   const [claimLoading, setClaimLoading] = useState(false)
   const [hasClaimed, setHasClaimed] = useState(false)
-  const [autoPurchaseStatus, setAutoPurchaseStatus] = useState<string | null>(null)
-
-  const { writeContractAsync: purchaseSadness } = useWriteContract()
   const { data: ethBalance } = useBalance({
     address: debugInfo?.address as `0x${string}`,
-    query: {
-      refetchInterval: 10_000, // Optional: 10 seconds polling
-    },
+    query: { refetchInterval: 10_000 },
   })
-  
 
-  // Fetch claimed status when modal opens or after claiming
+  // Check claim state on open or after claiming
   useEffect(() => {
     if (debugInfo?.address && isOpen) {
       fetch(`/api/claim-faucet?address=${debugInfo.address}`)
         .then(res => res.json())
         .then(data => setHasClaimed(!!data.claimed))
-        .catch(() => setHasClaimed(false));
+        .catch(() => setHasClaimed(false))
     }
-  }, [debugInfo?.address, isOpen, claimStatus]);
+  }, [debugInfo?.address, isOpen, claimStatus])
 
-  // Clear statuses after final purchase status
-  useEffect(() => {
-    if (autoPurchaseStatus?.startsWith("✅") || autoPurchaseStatus?.startsWith("❌")) {
-      const timer = setTimeout(() => {
-        setClaimStatus(null)
-        setAutoPurchaseStatus(null)
-      }, 60000)
-      return () => clearTimeout(timer)
+  const handleClaimSADToken = async () => {
+    if (!debugInfo?.address) return
+    setClaimLoading(true)
+    setClaimStatus("⏳ Sending 1 SAD token…")
+
+    try {
+      const res = await fetch("/api/claim-faucet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: debugInfo.address }),
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setHasClaimed(true)
+        setClaimStatus(`✅ 1 SAD sent! Tx: ${data.tokenTxHash}`)
+      } else {
+        setClaimStatus("❌ Claim failed: " + (data.error || "Unknown error"))
+      }
+    } catch (err: any) {
+      console.error("Claim error:", err)
+      setClaimStatus("❌ Claim failed: " + (err.message || "Unknown error"))
+    } finally {
+      setClaimLoading(false)
     }
-  }, [autoPurchaseStatus])
+  }
 
   if (!isOpen) {
     return (
@@ -65,47 +70,6 @@ export function DebugModal({ debugInfo }: DebugModalProps) {
         🔧 DEBUG
       </Button>
     )
-  }
-
-  const handleClaimSADToken = async () => {
-    if (!debugInfo?.address) return;
-    setClaimLoading(true)
-    setClaimStatus("✅ ETH sent! Awaiting auto SAD purchase... It can take up to a minute")
-    setAutoPurchaseStatus(null)
-
-    // Request ETH from faucet
-    try {
-      const res = await fetch("/api/claim-faucet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: debugInfo.address }),
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        setHasClaimed(true)
-
-        // Initiate SAD purchase via MetaMask (hash-only)
-        try {
-          setAutoPurchaseStatus("⏳ Initiating SAD purchase...")
-          const txHash = await purchaseSadness({
-            address: SEPOLIA_CONTRACTS.ConversionContract,
-            abi: ConversionContract_ABI,
-            functionName: "purchaseSadness",
-            args: [],
-            value: parseEther("0.007"),
-          })
-          setAutoPurchaseStatus(`✅ Transaction sent: ${txHash}`)
-        } catch (err: any) {
-          console.error("Auto purchase failed:", err)
-          setAutoPurchaseStatus("❌ Auto purchase failed: " + err.message)
-        }
-      } else {
-        setClaimStatus("❌ Claim failed: " + (data.error || "Unknown error"))
-      }
-    } catch (err: any) {
-      setClaimStatus("❌ Claim failed: " + (err.message || "Unknown error"))
-    }
-    setClaimLoading(false)
   }
 
   return (
@@ -135,26 +99,17 @@ export function DebugModal({ debugInfo }: DebugModalProps) {
                 {hasClaimed
                   ? '✅ Already Claimed'
                   : claimLoading
-                    ? 'Claiming...'
-                    : '💸 CLAIM FREE ETH + SAD'}
+                  ? 'Claiming…'
+                  : '💸 CLAIM 1 FREE SAD'}
               </Button>
               <div className="text-xs italic text-cyan-300 mt-1">
-                {hasClaimed ? '*You have already claimed FREE SAD' : '*First time SAD USERS only 😢'}
+                {hasClaimed
+                  ? '*You have already claimed FREE SAD'
+                  : '*First time SAD users only 😢'}
               </div>
-              {(claimStatus || autoPurchaseStatus) && (
-                <div className="flex flex-col items-center space-y-1">
-                  {claimStatus && (
-                    <div className={`text-xs font-mono ${
-                      claimStatus.startsWith('✅') ? 'text-green-400' :
-                     claimStatus.startsWith('⏳') ? 'text-yellow-300' : 'text-red-400'
-                    }`}>{claimStatus}</div>
-                  )}
-                  {autoPurchaseStatus && (
-                    <div className={`text-xs font-mono ${
-                      autoPurchaseStatus.startsWith('✅') ? 'text-green-400' :
-                     autoPurchaseStatus.startsWith('⏳') ? 'text-yellow-300' : 'text-red-400'
-                    }`}>{autoPurchaseStatus}</div>
-                  )}
+              {claimStatus && (
+                <div className="text-xs font-mono mt-2" style={{ color: claimStatus.startsWith('✅') ? '#4ade80' : claimStatus.startsWith('⏳') ? '#facc15' : '#f87171' }}>
+                  {claimStatus}
                 </div>
               )}
             </div>
