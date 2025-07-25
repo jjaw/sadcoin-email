@@ -13,9 +13,10 @@ interface DebugModalProps {
     useAWS?: boolean
     setUseAWS?: (value: boolean) => void
   }
+  gameState?: string
 }
 
-export function DebugModal({ debugInfo }: DebugModalProps) {
+export function DebugModal({ debugInfo, gameState }: DebugModalProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [claimStatus, setClaimStatus] = useState<string | null>(null)
   const [claimLoading, setClaimLoading] = useState(false)
