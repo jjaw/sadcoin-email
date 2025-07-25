@@ -17,3 +17,15 @@
 - **Fixed `tx.wait()` error:** Switched to displaying the returned transaction hash (hash‑only flow) to avoid `tx.wait is not a function` issues with Wagmi’s `useWriteContract`.  
 - **Clarified server vs. client roles:** Confirmed that the API route only funds ETH and records claims; all on‑chain purchases are initiated in the browser via Wagmi/MetaMask.  
 - **Documented MetaMask gas estimation behavior:** Added guidance on why MetaMask overestimates gas on Sepolia, how to estimate actual costs with `publicClient.estimateGas()`, and steps to manually cap gas fees in MetaMask’s advanced settings.  
+
+## [0.1.1]
+
+### Changed
+- **Faucet backend (`/api/claim-faucet` route)**
+  - Removed ETH‑funding logic; now sends 1 SAD token directly via ERC‑20 `transfer`.
+  - Added logging for success (`[Faucet] Sent 1 SAD to <address>, Tx: <txHash>`) and error cases.
+  - Updated response schema to return `{ success: true, tokenTxHash }` on success.
+- **Debug UI (`DebugModal.tsx`)**
+  - Removed ETH request & MetaMask auto‑purchase flow.
+  - Simplified claim button to POST to the faucet and display status: “⏳ Sending 1 SAD…” → “✅ 1 SAD sent! Tx: …”.
+  - Cleaned up unused state, imports and status messages to reflect direct token transfer.
