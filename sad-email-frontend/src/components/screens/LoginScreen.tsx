@@ -23,10 +23,10 @@ export function LoginScreen({ onSelectCharacter }: LoginScreenProps) {
 
       {/* Character Selection */}
       <div className="grid grid-cols-4 gap-6 mt-8">
-        {/* Officer - Available */}
+        {/* Officer - Unavailable */}
         <div 
-          className="flex flex-col items-center space-y-2 cursor-pointer hover:bg-green-900/20 p-2 rounded transition-colors"
-          onClick={() => handleSelectCharacter("officer")}
+          className="flex flex-col items-center space-y-2 cursor-not-allowed opacity-40 pointer-events-none p-2 rounded transition-colors"
+          onClick={() => {}} // no-op
         >
           <div className="w-24 h-24 border-2 border-green-400 bg-black flex items-center justify-center text-green-400 relative overflow-hidden">
             <div className="text-3xl">👨‍💼</div>
@@ -34,10 +34,10 @@ export function LoginScreen({ onSelectCharacter }: LoginScreenProps) {
           <span className="text-sm text-green-400 uppercase font-bold">OFFICER</span>
         </div>
 
-        {/* Agent - Available */}
+        {/* Agent - Unavailable */}
         <div 
-          className="flex flex-col items-center space-y-2 cursor-pointer hover:bg-green-900/20 p-2 rounded transition-colors"
-          onClick={() => handleSelectCharacter("agent")}
+          className="flex flex-col items-center space-y-2 cursor-not-allowed opacity-40 pointer-events-none p-2 rounded transition-colors"
+          onClick={() => {}} // no-op
         >
           <div className="w-24 h-24 border-2 border-green-400 bg-black flex items-center justify-center text-green-400 relative overflow-hidden">
             <div className="text-3xl">🕵️‍♀️</div>
@@ -45,10 +45,10 @@ export function LoginScreen({ onSelectCharacter }: LoginScreenProps) {
           <span className="text-sm text-green-400 uppercase font-bold">AGENT</span>
         </div>
 
-        {/* Monkey - Available */}
+        {/* Monkey - Unavailable */}
         <div 
-          className="flex flex-col items-center space-y-2 cursor-pointer hover:bg-green-900/20 p-2 rounded transition-colors"
-          onClick={() => handleSelectCharacter("monkey")}
+          className="flex flex-col items-center space-y-2 cursor-not-allowed opacity-40 pointer-events-none p-2 rounded transition-colors"
+          onClick={() => {}} // no-op
         >
           <div className="w-24 h-24 border-2 border-green-400 bg-black flex items-center justify-center text-green-400 relative overflow-hidden">
             <div className="text-3xl">🐵</div>
