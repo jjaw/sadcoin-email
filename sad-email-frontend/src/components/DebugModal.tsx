@@ -66,9 +66,9 @@ export function DebugModal({ debugInfo, gameState }: DebugModalProps) {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="bg-cyan-600 hover:bg-cyan-700 text-black text-sm px-3 py-1 h-auto"
+        className="bg-cyan-600 hover:bg-cyan-700 text-black text-xs px-2 py-1 h-6"
       >
-        🔧 DEBUG
+        🔧
       </Button>
     )
   }

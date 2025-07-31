@@ -6,8 +6,8 @@ interface LoginScreenProps {
 }
 
 export function LoginScreen({ onSelectCharacter }: LoginScreenProps) {
-  const handleSelectIntern = () => {
-    onSelectCharacter("intern")
+  const handleSelectCharacter = (character: Character) => {
+    onSelectCharacter(character)
   }
 
   return (
@@ -22,49 +22,50 @@ export function LoginScreen({ onSelectCharacter }: LoginScreenProps) {
       <div className="border-t border-green-400 w-full"></div>
 
       {/* Character Selection */}
-      <div className="grid grid-cols-4 gap-4 mt-8">
-        {/* Officer - Locked */}
-        <div className="flex flex-col items-center space-y-2">
-          <div className="w-16 h-16 border-2 border-green-400 bg-black flex items-center justify-center text-green-400 opacity-50">
-            👮
+      <div className="grid grid-cols-4 gap-6 mt-8">
+        {/* Officer - Available */}
+        <div 
+          className="flex flex-col items-center space-y-2 cursor-pointer hover:bg-green-900/20 p-2 rounded transition-colors"
+          onClick={() => handleSelectCharacter("officer")}
+        >
+          <div className="w-24 h-24 border-2 border-green-400 bg-black flex items-center justify-center text-green-400 relative overflow-hidden">
+            <div className="text-3xl">👨‍💼</div>
           </div>
-          <span className="text-sm text-green-400 opacity-50">Officer</span>
-          <span className="text-xs text-red-400">LOCKED</span>
+          <span className="text-sm text-green-400 uppercase font-bold">OFFICER</span>
         </div>
 
-        {/* Agent - Locked */}
-        <div className="flex flex-col items-center space-y-2">
-          <div className="w-16 h-16 border-2 border-green-400 bg-black flex items-center justify-center text-green-400 opacity-50">
-            🕵️
+        {/* Agent - Available */}
+        <div 
+          className="flex flex-col items-center space-y-2 cursor-pointer hover:bg-green-900/20 p-2 rounded transition-colors"
+          onClick={() => handleSelectCharacter("agent")}
+        >
+          <div className="w-24 h-24 border-2 border-green-400 bg-black flex items-center justify-center text-green-400 relative overflow-hidden">
+            <div className="text-3xl">🕵️‍♀️</div>
           </div>
-          <span className="text-sm text-green-400 opacity-50">Agent</span>
-          <span className="text-xs text-red-400">LOCKED</span>
+          <span className="text-sm text-green-400 uppercase font-bold">AGENT</span>
         </div>
 
-        {/* Monkey - Locked */}
-        <div className="flex flex-col items-center space-y-2">
-          <div className="w-16 h-16 border-2 border-green-400 bg-black flex items-center justify-center text-green-400 opacity-50">
-            🐒
+        {/* Monkey - Available */}
+        <div 
+          className="flex flex-col items-center space-y-2 cursor-pointer hover:bg-green-900/20 p-2 rounded transition-colors"
+          onClick={() => handleSelectCharacter("monkey")}
+        >
+          <div className="w-24 h-24 border-2 border-green-400 bg-black flex items-center justify-center text-green-400 relative overflow-hidden">
+            <div className="text-3xl">🐵</div>
           </div>
-          <span className="text-sm text-green-400 opacity-50">Monkey</span>
-          <span className="text-xs text-red-400">LOCKED</span>
+          <span className="text-sm text-green-400 uppercase font-bold">MONKEY</span>
         </div>
 
         {/* Intern - Available */}
         <div 
           className="flex flex-col items-center space-y-2 cursor-pointer hover:bg-green-900/20 p-2 rounded transition-colors"
-          onClick={handleSelectIntern}
+          onClick={() => handleSelectCharacter("intern")}
         >
-          <div className="w-16 h-16 border-2 border-green-400 bg-black flex items-center justify-center text-green-400">
-            👨‍💼
+          <div className="w-24 h-24 border-2 border-green-400 bg-black flex items-center justify-center text-green-400 relative overflow-hidden">
+            <div className="text-3xl">👩‍💼</div>
           </div>
-          <span className="text-sm text-green-400">Intern</span>
-          <span className="text-xs text-green-300">CLICK TO SELECT</span>
+          <span className="text-sm text-green-400 uppercase font-bold">INTERN</span>
         </div>
-      </div>
-
-      <div className="text-sm text-green-500 mt-4">
-        Only Intern access granted. Other characters require higher clearance level.
       </div>
     </div>
   )
