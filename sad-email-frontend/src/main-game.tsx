@@ -472,7 +472,7 @@ export default function Component() {
         feelsBalance={feels}
         onAboutClick={() => setIsAboutModalOpen(true)}
       />
-      <div className="bg-black" style={{ minHeight: "calc(100vh - 70px)", marginTop: "80px" }}>
+      <div className="bg-black" style={{ minHeight: "calc(100vh - 70px)", marginTop: "100px" }}>
         {/* Monitor Area */}
         <CRTContainer>
           <Card className="border-0 border-green-400 bg-transparent text-green-400 w-full h-full flex flex-col">
