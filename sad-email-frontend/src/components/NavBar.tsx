@@ -196,22 +196,45 @@ export default function NavBar({ gameState, debugInfo, sadBalance = "0", feelsBa
                   )}
                 </>
               ) : (
-                <button
-                  style={{
-                    background: "#111",
-                    color: "#39ff14",
-                    border: "1px solid #39ff14",
-                    borderRadius: "4px",
-                    fontFamily: "monospace",
-                    fontWeight: "bold",
-                    fontSize: "0.8rem",
-                    padding: "0.4rem 2.5rem",
-                    minWidth: "160px",
-                    textAlign: "center"
-                  }}
-                >
-                  CONNECTED
-                </button>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                  <button
+                    style={{
+                      background: "#111",
+                      color: "#39ff14",
+                      border: "1px solid #39ff14",
+                      borderRadius: "4px",
+                      fontFamily: "monospace",
+                      fontWeight: "bold",
+                      fontSize: "0.8rem",
+                      padding: "0.4rem 1.8rem",
+                      textAlign: "center"
+                    }}
+                  >
+                    CONNECTED
+                  </button>
+                  <button
+                    onClick={() => disconnect()}
+                    style={{
+                      background: "#111",
+                      color: "#ff6b6b",
+                      border: "1px solid #ff6b6b",
+                      borderRadius: "4px",
+                      fontFamily: "monospace",
+                      fontWeight: "bold",
+                      fontSize: "0.7rem",
+                      padding: "0.4rem 0.5rem",
+                      cursor: "pointer",
+                      width: "28px",
+                      height: "28px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center"
+                    }}
+                    title="Disconnect wallet"
+                  >
+                    ×
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -226,7 +249,7 @@ export default function NavBar({ gameState, debugInfo, sadBalance = "0", feelsBa
             width: "194px",
             marginLeft: "0px"
           }}>
-            {!isClient ? "" : !isConnected ? "Null" : `${address?.slice(0, 14)}...${address?.slice(-14)}`}
+            {!isClient ? "" : !isConnected ? "Address: 0xNULL" : `${address?.slice(0, 14)}...${address?.slice(-14)}`}
           </div>
         </div>
       </div>
