@@ -104,7 +104,6 @@ export default function Component() {
   const [emailSubject, setEmailSubject] = useState("")
   const [emailBody, setEmailBody] = useState("")
   
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [gameProgress, setGameProgress] = useState(0)
 
   useEffect(() => {

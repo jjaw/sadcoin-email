@@ -1,5 +1,4 @@
-import Database from 'better-sqlite3';
-import path from 'path';
+import { Redis } from '@upstash/redis';
 import {
   createWalletClient,
   http,
@@ -13,17 +12,11 @@ import {
   SADCoin_ABI,
 } from '@/lib/contracts';
 
-// Use a persistent file in the project root
-const db = new Database(path.resolve(process.cwd(), 'faucet-claims.db'));
-
-// Ensure claims table exists
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS claims (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    address TEXT UNIQUE NOT NULL,
-    claimed_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`).run();
+// Initialize Redis
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
 
 // Env vars
 const PRIVATE_KEY = process.env.FAUCET_PRIVATE_KEY as string;
@@ -57,13 +50,13 @@ export async function POST(req: Request) {
 
   // Already claimed?
   try {
-    const existing = db.prepare('SELECT 1 FROM claims WHERE address = ?').get(address.toLowerCase());
+    const existing = await redis.get(`faucet_claim:${address.toLowerCase()}`);
     if (existing) {
       console.info('[Faucet] Already claimed:', address);
       return new Response(JSON.stringify({ error: 'Already claimed' }), { status: 403 });
     }
   } catch (err) {
-    console.error('[Faucet] DB check error:', err);
+    console.error('[Faucet] Redis check error:', err);
     return new Response(JSON.stringify({ error: 'Database error' }), { status: 500 });
   }
 
@@ -87,10 +80,14 @@ export async function POST(req: Request) {
 
   // Record claim
   try {
-    db.prepare('INSERT INTO claims (address) VALUES (?)').run(address.toLowerCase());
+    await redis.set(`faucet_claim:${address.toLowerCase()}`, {
+      address: address.toLowerCase(),
+      claimed_at: new Date().toISOString(),
+      txHash: tokenTxHash
+    });
     console.info(`[Faucet] Claim recorded: ${address}`);
   } catch (err) {
-    console.error('[Faucet] DB record error:', err);
+    console.error('[Faucet] Redis record error:', err);
   }
 
   return new Response(JSON.stringify({ success: true, tokenTxHash }), { status: 200 });
@@ -103,8 +100,12 @@ export async function GET(req: Request) {
   if (!address || !/^0x[a-fA-F0-9]{40}$/.test(address)) {
     return new Response(JSON.stringify({ error: 'Invalid address' }), { status: 400 });
   }
-  const existing = db
-    .prepare('SELECT 1 FROM claims WHERE address = ?')
-    .get(address.toLowerCase());
-  return new Response(JSON.stringify({ claimed: !!existing }), { status: 200 });
+  
+  try {
+    const existing = await redis.get(`faucet_claim:${address.toLowerCase()}`);
+    return new Response(JSON.stringify({ claimed: !!existing }), { status: 200 });
+  } catch (err) {
+    console.error('[Faucet] Redis GET error:', err);
+    return new Response(JSON.stringify({ error: 'Database error' }), { status: 500 });
+  }
 }

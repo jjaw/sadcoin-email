@@ -17,7 +17,7 @@ if (!projectId) {
 const metadata = {
   name: 'SadCoin Email Frontend',
   description: 'SadCoin Email Frontend',
-  url: 'http://localhost:3000', // Update this to match your domain
+  url: process.env.NODE_ENV === 'production' ? 'https://www.letswritean.email' : 'http://localhost:3000',
   icons: ['https://avatars.githubusercontent.com/u/179229932']
 }
 
@@ -41,19 +41,22 @@ const wagmiAdapter = new WagmiAdapter({
 
 const config = wagmiAdapter.wagmiConfig
 
-// Create the modal
-createAppKit({
-  adapters: [wagmiAdapter],
-  projectId,
-  networks: [mainnet, sepolia],
-  metadata,
-  features: {
-    email: false,
-    socials: ['google', 'discord', 'github'],
-    emailShowWallets: false
-  },
-  allWallets: 'HIDE'
-})
+// Create the modal with singleton pattern to prevent double initialization
+let appKitInstance: any = null;
+if (typeof window !== 'undefined' && !appKitInstance) {
+  appKitInstance = createAppKit({
+    adapters: [wagmiAdapter],
+    projectId,
+    networks: [mainnet, sepolia],
+    metadata,
+    features: {
+      email: false,
+      socials: ['google', 'discord', 'github'],
+      emailShowWallets: false
+    },
+    allWallets: 'HIDE'
+  })
+}
 
 function ContextProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
   const queryClient = new QueryClient()
