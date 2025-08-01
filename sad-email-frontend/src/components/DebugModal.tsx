@@ -26,6 +26,16 @@ export function DebugModal({ debugInfo, gameState }: DebugModalProps) {
     query: { refetchInterval: 10_000 },
   })
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = 'unset'
+      }
+    }
+  }, [isOpen])
+
   // Check claim state on open or after claiming
   useEffect(() => {
     if (debugInfo?.address && isOpen) {
@@ -74,8 +84,8 @@ export function DebugModal({ debugInfo, gameState }: DebugModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-black border-2 border-green-400 max-w-4xl max-h-[90vh] overflow-auto m-4">
+    <div className="fixed inset-0 bg-black flex items-center justify-center pt-24 pb-12 px-4" style={{ zIndex: 999 }}>
+      <div className="bg-black border-2 border-green-400 max-w-4xl w-full max-h-full flex flex-col">
         <div className="flex justify-between items-center p-4 border-b border-green-400">
           <h2 className="text-green-400 font-mono text-lg">BLOCKCHAIN DEBUG CONSOLE</h2>
           <Button
@@ -85,7 +95,7 @@ export function DebugModal({ debugInfo, gameState }: DebugModalProps) {
             ✕ CLOSE
           </Button>
         </div>
-        <div className="p-4 space-y-6">
+        <div className="p-4 space-y-6 overflow-y-auto flex-1 pb-8">
           {debugInfo?.isConnected && (
             <div className="flex flex-col items-center space-y-2 bg-black border border-cyan-400 p-3 rounded">
               <Button

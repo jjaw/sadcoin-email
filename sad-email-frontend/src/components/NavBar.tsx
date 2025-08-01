@@ -154,7 +154,7 @@ export default function NavBar({ gameState, debugInfo, sadBalance = "0", feelsBa
                         borderRadius: "6px",
                         minWidth: "180px",
                         boxShadow: "0 2px 8px #000a",
-                        zIndex: 100,
+                        zIndex: 1200,
                       }}
                     >
                       <button
